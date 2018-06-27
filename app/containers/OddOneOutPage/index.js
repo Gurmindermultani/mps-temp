@@ -14,6 +14,8 @@ import List from './List';
 import ListItem from './ListItem';
 import ListItemTitle from './ListItemTitle';
 import styled from 'styled-components';
+import ReactDOM from 'react-dom';
+import Audio from 'components/Audio';
 
 import backgroundImage from 'images/A1_Instructions.png';
 import monsterWobble from 'images/monster_act_2.png';
@@ -25,16 +27,22 @@ import continueImageHover from 'images/continue_BTN_Down.png';
 
 import images from "./cardImages";
 
+import linkClickAudio from 'audio/button-21.mp3';
+import correctAudio from 'audio/magic-chime-02.mp3';
+import inCorrectAudio from 'audio/Buzz.mp3';
+
 
 const OddOneOutWrapper = styled.div`
     background-image: url(${backgroundImage});
     background-size: contain;
     height: 700px;
     position: relative;
+    padding-top: 4%;
     width: 100%;
     .textContainer{
       display: inline-block;
-      margin-left: 110px;
+      padding-left: 12%;
+      width: 45%;
     }
     .text{
       color : #eaebec;
@@ -45,7 +53,7 @@ const OddOneOutWrapper = styled.div`
       background-size: 204px;
       height: 77px;
       width: 195px;
-      margin-top: 100px;
+      margin-top: 20%;
       cursor: pointer;
       &:hover {
         background-image: url(${continueImageHover});
@@ -53,12 +61,12 @@ const OddOneOutWrapper = styled.div`
     }
     .imageContainer{
       display: inline-block;
-      width: 50%;
+      width: 55%;
+      padding-top: 6%;
 
       img{
-        margin-top: 70px;
-        height: 550px;
-        margin-left: 40px;
+        height: 100%;
+        width: 100%;
         -webkit-animation: mover 1s infinite  alternate;
         animation: mover 1s infinite  alternate;
       }
@@ -72,34 +80,35 @@ const OddOneOutWrapper = styled.div`
       }
     }
     .cardContainer{
+      height: 100%;
+
       img{
-        margin: 98px 97px;
-        cursor: pointer;
+        margin: 7% 11%;
         position: absolute;
-        width: 82%;
+        width: 80%;
       }
       div{
         position: relative;
-        width: 336px;
-        height: 228px;
+        width: 35%;
+        height: 28%;
         display: inline-block;
         cursor: pointer;
       }
       .topLeft{
-        top: 120px;
-        left: 117px;
+        top: 11%;
+        left: 14%;
       }
       .topRight{
-        top: 120px;
-        left: 117px;
+        top: 11%;
+        left: 14%;
       }
       .bottomLeft{
-        top: 120px;
-        left: 117px;
+        top: 11%;
+        left: 14%;
       }
       .bottomRight{
-        top: 120px;
-        left: 117px;
+        top: 11%;
+        left: 14%;
       }
     }
     .homeButton{
@@ -116,8 +125,14 @@ const OddOneOutWrapper = styled.div`
         background-image: url(${homeButtonHover});
       }
     }
+    .homeMessage{
+      color: white;
+      text-align: center;
+      margin-top: 79px;
+    }
 `;
 
+const answerKey = [null,"bottomLeft","bottomRight","topRight","topLeft","bottomLeft","topRight","bottomLeft","topLeft","bottomRight","topLeft","bottomRight","bottomLeft"];
 
 export default class OddOneOutPage extends React.Component {
   constructor(props){
@@ -130,16 +145,74 @@ export default class OddOneOutPage extends React.Component {
   }
   handleContinue(e) {
     this.setState({continue : true});
+    this.playAudio("continue");
   }
-  checkAnswer(e) {
+  checkAnswer(answer) {
     var that = this;
     this.setState({currentCard : images["answer" + that.state.currentCardCounter]});
+    if(answer === answerKey[that.state.currentCardCounter]){
+      this.playAudio("correct");
+    }else{
+      this.playAudio("incorrect");
+    }
     setTimeout(function(){
       that.setState({currentCard : images["card" + (that.state.currentCardCounter + 1)]});
       that.setState({currentCardCounter : that.state.currentCardCounter + 1});
     },1000);
   }
+
+  playAudio(type,link){
+    var src = "";
+    if(type === "continue"){
+      src = linkClickAudio;
+    }
+
+    if(type === "correct"){
+      src = correctAudio;
+    }
+
+    if(type === "incorrect"){
+      src = inCorrectAudio;
+    }
+
+
+    const audio = ReactDOM.findDOMNode(this.refs.audio);
+    audio.src = src;
+    audio.load();
+    var playPromise = audio.play();
+
+    if (playPromise !== undefined) {
+      playPromise.then(_ => {
+        // Automatic playback started!
+        // Show playing UI.
+        audio.play();
+      })
+      .catch(error => {
+        // Auto-play was prevented
+        // Show paused UI.
+        audio.play();
+      });
+    }
+  }
+
   render() {
+    if(this.state.currentCardCounter > 12){
+      return (
+        <OddOneOutWrapper>
+          <Helmet>
+            <title>Feature Page</title>
+            <meta
+              name="description"
+              content="OddOneOutPage"
+            />
+          </Helmet>
+          <Link className="homeButton" to="/teacher-creature"></Link>
+          <h1 className="homeMessage">Click on Home Button to Go Home.</h1>
+        </OddOneOutWrapper>
+      )
+    }
+
+
     return (
       <OddOneOutWrapper>
         <Helmet>
@@ -149,7 +222,7 @@ export default class OddOneOutPage extends React.Component {
             content="OddOneOutPage"
           />
         </Helmet>
-        <Link className="homeButton" to="/"></Link>
+        <Link className="homeButton" to="/teacher-creature"></Link>
         {!this.state.continue && (
           <div>
             <div className="textContainer">
@@ -169,12 +242,16 @@ export default class OddOneOutPage extends React.Component {
         {this.state.continue && (
           <div className="cardContainer">
               <img src={this.state.currentCard} />
-              <div onClick={this.checkAnswer.bind(this)} className="topLeft"></div>
-              <div onClick={this.checkAnswer.bind(this)} className="topRight"></div>
-              <div onClick={this.checkAnswer.bind(this)} className="bottomLeft"></div>
-              <div onClick={this.checkAnswer.bind(this)} className="bottomRight"></div>
+              <div onClick={this.checkAnswer.bind(this,"topLeft")} className="topLeft"></div>
+              <div onClick={this.checkAnswer.bind(this,"topRight")} className="topRight"></div>
+              <div onClick={this.checkAnswer.bind(this,"bottomLeft")} className="bottomLeft"></div>
+              <div onClick={this.checkAnswer.bind(this,"bottomRight")} className="bottomRight"></div>
           </div>
         )}
+        <Audio
+          ref="audio"
+          volume={1}
+          autoplay={false}/>
       </OddOneOutWrapper>
     );
   }

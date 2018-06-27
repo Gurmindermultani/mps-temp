@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
@@ -24,6 +25,7 @@ import {
   makeSelectError,
 } from 'containers/App/selectors';
 import H2 from 'components/H2';
+import Audio from 'components/Audio';
 import ReposList from 'components/ReposList';
 import AtPrefix from './AtPrefix';
 import CenteredSection from './CenteredSection';
@@ -51,20 +53,19 @@ import match from 'images/Activity_Button_03_Up.png';
 import matchHover from 'images/Activity_Button_03_Down.png';
 import backgroundImage from 'images/MonsterTexture-1.png';
 
-
+import linkClickAudio from 'audio/button-21.mp3';
 
 const HomeWrapper = styled.div`
 	background-image: url(${backgroundImage});
-  	background-size: contain;
-    height: 700px;
-    width: 100%;
+	background-size: contain;
+  height: 700px;
+  width: 100%;
 `;
 
 const CreatureImageContainer = styled.div`
-	width: 800px;
-	height: 200px;
-	margin-left: 50px;
-	margin-top: 50px;
+	width: 90%;
+  padding-top: 5%;
+  margin-left: 5%;
 `;
 
 const Image = styled.img`
@@ -74,41 +75,41 @@ const Image = styled.img`
 
 const LinkContainer = styled.div`
 	width: 88%;
-	padding-top : 4px;
 	margin: auto;
-	margin-top : 40px;
-	height: 330px;
+  min-height: 306px;
 	background-image: url(${leftMonsterImage}),url(${rightMonsterImage});
-	background-size: 300px,430px;
+	background-size: 38%,53%;
 	background-position:
 	    top 0px left 0px,
-	    top -80px right -58px;
+	    top -57px right -58px;
+  a{
+    display:block;
+    min-height: 90px;
+  }
 `;
 
 const LinkToOdd = styled.div`
 	width: 31%;
 	margin: auto;
-	margin-top: 10px;
 	background-image: url(${oddOneOut});
-	background-size: 255px;
-    height: 92px;
-    background-position: top -20px left -8px;
-    cursor : pointer;
-    &:hover {
-		background-image: url(${oddOneOutHover});
+  background-position: top -10px left 0px;
+  background-size: 100% 115%;
+  min-height: 90px;
+  cursor : pointer;
+  &:hover {
+	 background-image: url(${oddOneOutHover});
 	}
 `;
 
 const LinkToMatch = styled.div`
 	width: 31%;
 	margin: auto;
-	margin-top: 10px;
 	background-image: url(${match});
-	background-size: 255px;
-    height: 92px;
-    background-position: top -20px left -8px;
-    cursor : pointer;
-    &:hover {
+  background-position: top -10px left 0px;
+  background-size: 100% 115%;
+  min-height: 90px;
+  cursor : pointer;
+  &:hover {
 		background-image: url(${matchHover});
 	}
 `;
@@ -116,14 +117,13 @@ const LinkToMatch = styled.div`
 const LinkToFlashGame = styled.div`
 	width: 31%;
 	margin: auto;
-	margin-top: 10px;
 	background-image: url(${flashCardImage});
-	background-size: 255px;
-    height: 92px;
-    background-position: top -20px left -8px;
-    cursor : pointer;
-    &:hover {
-		background-image: url(${flashCardImageHover});
+  background-position: top -10px left 0px;
+  background-size: 100% 115%;
+  min-height: 90px;
+  cursor : pointer;
+  &:hover {
+	 background-image: url(${flashCardImageHover});
 	}
 `;
 
@@ -135,6 +135,26 @@ export class HomePage extends React.PureComponent {
   componentDidMount() {
     if (this.props.username && this.props.username.trim().length > 0) {
       this.props.onSubmitForm();
+    }
+  }
+
+  playAudio(){
+    const audio = ReactDOM.findDOMNode(this.refs.audio);
+    audio.src = linkClickAudio;
+    audio.load();
+    var playPromise = audio.play();
+
+    if (playPromise !== undefined) {
+      playPromise.then(_ => {
+        // Automatic playback started!
+        // Show playing UI.
+        audio.play();
+      })
+      .catch(error => {
+        // Auto-play was prevented
+        // Show paused UI.
+        audio.play();
+      });
     }
   }
 
@@ -161,17 +181,21 @@ export class HomePage extends React.PureComponent {
             	<Image src={creativeImage} />
             </CreatureImageContainer>
             <LinkContainer>
-            	<Link to="/flashCard">
-            		<LinkToFlashGame></LinkToFlashGame>
-        		</Link>
-        		<Link to="/oddOneOut">
-            		<LinkToOdd></LinkToOdd>
-        		</Link>
-        		<Link to="/match">
-            		<LinkToMatch></LinkToMatch>
-        		</Link>
+              <LinkToFlashGame onClick={this.playAudio.bind(this)}>
+            	   <Link to="/teacher-creature/flashCard"></Link>
+              </LinkToFlashGame>
+          		<LinkToOdd onClick={this.playAudio.bind(this)}>
+                <Link to="/teacher-creature/oddOneOut"></Link>  
+              </LinkToOdd>
+          		<LinkToMatch onClick={this.playAudio.bind(this)}>
+                <Link to="/teacher-creature/match"></Link>  
+              </LinkToMatch>
             </LinkContainer>
           </CenteredSection>
+          <Audio
+            ref="audio"
+            volume={1}
+            autoplay={false}/>
         </div>
       </HomeWrapper>
     );

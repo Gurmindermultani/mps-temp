@@ -13,6 +13,8 @@ import { Switch, Route } from 'react-router-dom';
 
 import HomePage from 'containers/HomePage/Loadable';
 import OddOneOutPage from 'containers/OddOneOutPage/Loadable';
+import FlashCardPage from 'containers/FlashCardPage/Loadable';
+import MatchPage from 'containers/MatchPage/Loadable';
 import FeaturePage from 'containers/FeaturePage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import Header from 'components/Header';
@@ -21,11 +23,13 @@ import Footer from 'components/Footer';
 import backgroundImage from 'images/MonsterTexture-1.png';
 
 const AppWrapper = styled.div`
-  max-width: calc(908px + 16px * 2);
+  min-width: 768px;
+  max-width: 900px;
   margin: 0 auto;
-  display: flex;
   min-height: 100%;
   padding: 0 16px;
+  position: relative;
+
 `;
 
 export default function App() {
@@ -38,10 +42,13 @@ export default function App() {
         <meta name="description" content="A React.js Boilerplate application" />
       </Helmet>
       <Switch>
-        <Route exact path="/" component={HomePage} />
-        <Route path="/oddOneOut" component={OddOneOutPage} />
+        <Route exact path="/teacher-creature" component={HomePage} />
+        <Route path="/teacher-creature/flashCard" component={FlashCardPage} />
+        <Route path="/teacher-creature/oddOneOut" component={OddOneOutPage} />
+        <Route path="/teacher-creature/match" component={MatchPage} />
         <Route path="" component={NotFoundPage} />
       </Switch>
+      <Footer />
     </AppWrapper>
   );
 }
